@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendário Personalizado | Dias Úteis</title>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <link rel="shortcut icon" href="./favicon" type="image/x-icon">
+    <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Calendário Dias Úteis</h1>
+        <form id="calendarioForm">
+            <div class="form-group datepicker">
+                <label for="calendario">Escolha uma data:</label>
+                <input type="text" id="calendario" name="calendario">
+            </div>
+            <button type="submit" class="button">Enviar</button>
+        </form>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/i18n/datepicker-pt-BR.js"></script> -->
+    <script>
+        /* Portuguese/Brazil initialisation for the jQuery UI date picker plugin. */
+jQuery(function($){
+	$.datepicker.regional['pt-BR'] = {
+		closeText: 'Fechar',
+		prevText: '&#x3C;Anterior',
+		nextText: 'Próximo&#x3E;',
+		currentText: 'Hoje',
+		monthNames: ['Janeiro','Fevereiro','Março','Abril','Maio','Junho',
+		'Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'],
+		monthNamesShort: ['Jan','Fev','Mar','Abr','Mai','Jun',
+		'Jul','Ago','Set','Out','Nov','Dez'],
+		dayNames: ['Domingo','Segunda-feira','Terça-feira','Quarta-feira','Quinta-feira','Sexta-feira','Sábado'],
+		dayNamesShort: ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'],
+		dayNamesMin: ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'],
+		weekHeader: 'Sm',
+		dateFormat: 'dd/mm/yy',
+		firstDay: 0,
+		isRTL: false,
+		showMonthAfterYear: false,
+		yearSuffix: ''};
+	$.datepicker.setDefaults($.datepicker.regional['pt-BR']);
+});
+    </script>
+    <script>
+        // Array de datas disponíveis (no formato "yy-mm-dd")
+        var datasDisponiveis = ["2023-09-25", "2023-09-28", "2023-10-02"];
+
+        // Lista de feriados (no formato "mm-dd")
+        var feriados = ["01-01", "04-21", "05-01", "09-07", "10-12", "11-02", "12-25"];
+
+        // Função para verificar se uma data é um final de semana (sábado ou domingo)
+        function isFinalDeSemana(date) {
+            var dayOfWeek = date.getDay();
+            return dayOfWeek === 0 || dayOfWeek === 6;
+        }
+
+        // Função para verificar se uma data é um feriado
+        function isFeriado(date) {
+            var month = date.getMonth() + 1; // Meses são indexados de 0 a 11
+            var day = date.getDate();
+            var formattedDate = (month < 10 ? "0" : "") + month + "-" + (day < 10 ? "0" : "") + day;
+            return feriados.indexOf(formattedDate) !== -1;
+        }
+
+        // Função para inicializar o seletor de datas personalizado
+        $(function () {
+            $.datepicker.setDefaults($.datepicker.regional['pt-BR']); // Definir localização brasileira
+
+            $("#calendario").datepicker({
+                beforeShowDay: function (date) {
+                    // Formatar a data no formato "yy-mm-dd"
+                    var formattedDate = $.datepicker.formatDate("yy-mm-dd", date);
+
+                    // Verificar se a data está na lista de datas disponíveis
+                    if ($.inArray(formattedDate, datasDisponiveis) !== -1) {
+                        // A data está disponível (não é somente leitura)
+                        return [true, ""];
+                    } else if (isFinalDeSemana(date) || isFeriado(date)) {
+                        // É um final de semana ou feriado (somente leitura)
+                        return [false, "ui-state-disabled"];
+                    } else {
+                        // A data não está disponível (remover classe somente leitura)
+                        return [true, ""];
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
